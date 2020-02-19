@@ -351,9 +351,11 @@ class CpuMonitor {
                 // No current frequency information for this CPU core - ignore it.
                 continue;
             }
+
             if (cpuFreqCur > 0) {
                 actualCpusPresent++;
             }
+
             cpuFreqCurSum += cpuFreqCur;
 
             /* Here, lastSeenMaxFreq might come from

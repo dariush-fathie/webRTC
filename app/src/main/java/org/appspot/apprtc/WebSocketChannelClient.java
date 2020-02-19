@@ -90,13 +90,17 @@ public class WebSocketChannelClient {
             Log.e(TAG, "WebSocket is already connected.");
             return;
         }
+
         wsServerUrl = wsUrl;
         postServerUrl = postUrl;
         closeEvent = false;
 
+        //wss://apprtc-ws.webrtc.org:443/ws
+
         Log.d(TAG, "Connecting WebSocket to: " + wsUrl + ". Post URL: " + postUrl);
         ws = new WebSocketConnection();
         wsObserver = new WebSocketObserver();
+
         try {
             ws.connect(wsServerUrl, wsObserver);
         } catch (Exception e) {
@@ -169,6 +173,7 @@ public class WebSocketChannelClient {
 
     public void disconnect(boolean waitForComplete) {
         checkIfCalledOnValidThread();
+
         Log.d(TAG, "Disconnect WebSocket. State: " + state);
         if (state == WebSocketConnectionState.REGISTERED) {
             // Send "bye" to WebSocket server.
@@ -177,6 +182,7 @@ public class WebSocketChannelClient {
             // Send http DELETE to http WebSocket server.
             sendWSSMessage("DELETE", "");
         }
+
         // Close WebSocket in CONNECTED or ERROR states only.
         if (state == WebSocketConnectionState.CONNECTED || state == WebSocketConnectionState.ERROR) {
             ws.disconnect();
@@ -197,21 +203,21 @@ public class WebSocketChannelClient {
                 }
             }
         }
+
         Log.d(TAG, "Disconnecting WebSocket done.");
     }
 
+
     private void reportError(final String errorMessage) {
         Log.e(TAG, errorMessage);
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (state != WebSocketConnectionState.ERROR) {
-                    state = WebSocketConnectionState.ERROR;
-                    events.onWebSocketError(errorMessage);
-                }
+        handler.post(() -> {
+            if (state != WebSocketConnectionState.ERROR) {
+                state = WebSocketConnectionState.ERROR;
+                events.onWebSocketError(errorMessage);
             }
         });
     }
+
 
     // Asynchronously send POST/DELETE to WebSocket server.
     private void sendWSSMessage(final String method, final String message) {
@@ -243,14 +249,11 @@ public class WebSocketChannelClient {
         @Override
         public void onOpen() {
             Log.d(TAG, "WebSocket connection opened to: " + wsServerUrl);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    state = WebSocketConnectionState.CONNECTED;
-                    // Check if we have pending register request.
-                    if (roomID != null && clientID != null) {
-                        register(roomID, clientID);
-                    }
+            handler.post(() -> {
+                state = WebSocketConnectionState.CONNECTED;
+                // Check if we have pending register request.
+                if (roomID != null && clientID != null) {
+                    register(roomID, clientID);
                 }
             });
         }
@@ -263,13 +266,10 @@ public class WebSocketChannelClient {
                 closeEvent = true;
                 closeEventLock.notify();
             }
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (state != WebSocketConnectionState.CLOSED) {
-                        state = WebSocketConnectionState.CLOSED;
-                        events.onWebSocketClose();
-                    }
+            handler.post(() -> {
+                if (state != WebSocketConnectionState.CLOSED) {
+                    state = WebSocketConnectionState.CLOSED;
+                    events.onWebSocketClose();
                 }
             });
         }
@@ -278,13 +278,10 @@ public class WebSocketChannelClient {
         public void onTextMessage(String payload) {
             Log.d(TAG, "WSS->C: " + payload);
             final String message = payload;
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (state == WebSocketConnectionState.CONNECTED
-                            || state == WebSocketConnectionState.REGISTERED) {
-                        events.onWebSocketMessage(message);
-                    }
+            handler.post(() -> {
+                if (state == WebSocketConnectionState.CONNECTED
+                        || state == WebSocketConnectionState.REGISTERED) {
+                    events.onWebSocketMessage(message);
                 }
             });
         }

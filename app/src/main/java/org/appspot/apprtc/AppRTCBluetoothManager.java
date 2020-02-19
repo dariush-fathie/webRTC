@@ -420,6 +420,7 @@ public class AppRTCBluetoothManager {
         == PackageManager.PERMISSION_GRANTED;
   }
 
+
   /** Logs the state of the local Bluetooth adapter. */
   @SuppressLint("HardwareIds")
   protected void logBluetoothAdapterInfo(BluetoothAdapter localAdapter) {
@@ -437,6 +438,7 @@ public class AppRTCBluetoothManager {
       }
     }
   }
+
 
   /** Ensures that the audio manager updates its list of available audio devices. */
   private void updateAudioDeviceState() {

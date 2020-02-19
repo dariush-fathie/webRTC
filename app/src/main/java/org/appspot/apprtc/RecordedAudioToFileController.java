@@ -40,6 +40,7 @@ public class RecordedAudioToFileController implements SamplesReadyCallback {
   private boolean isRunning;
   private long fileSizeInBytes;
 
+
   public RecordedAudioToFileController(ExecutorService executor) {
     Log.d(TAG, "ctor");
     this.executor = executor;
@@ -81,6 +82,7 @@ public class RecordedAudioToFileController implements SamplesReadyCallback {
     }
   }
 
+
   // Checks if external storage is available for read and write.
   private boolean isExternalStorageWritable() {
     String state = Environment.getExternalStorageState();
@@ -89,6 +91,7 @@ public class RecordedAudioToFileController implements SamplesReadyCallback {
     }
     return false;
   }
+
 
   // Utilizes audio parameters to create a file name which contains sufficient
   // information so that the file can be played using an external file player.
@@ -106,6 +109,7 @@ public class RecordedAudioToFileController implements SamplesReadyCallback {
     Log.d(TAG, "Opened file for recording: " + fileName);
   }
 
+
   // Called when new audio samples are ready.
   @Override
   public void onWebRtcAudioRecordSamplesReady(JavaAudioDeviceModule.AudioSamples samples) {
@@ -116,9 +120,11 @@ public class RecordedAudioToFileController implements SamplesReadyCallback {
     }
     synchronized (lock) {
       // Abort early if stop() has been called.
+
       if (!isRunning) {
         return;
       }
+
       // Open a new file for the first callback only since it allows us to add audio parameters to
       // the file name.
       if (rawAudioFileOutputStream == null) {
@@ -126,6 +132,8 @@ public class RecordedAudioToFileController implements SamplesReadyCallback {
         fileSizeInBytes = 0;
       }
     }
+
+
     // Append the recorded 16-bit audio samples to the open output file.
     executor.execute(() -> {
       if (rawAudioFileOutputStream != null) {
@@ -143,4 +151,7 @@ public class RecordedAudioToFileController implements SamplesReadyCallback {
       }
     });
   }
+
+
+
 }

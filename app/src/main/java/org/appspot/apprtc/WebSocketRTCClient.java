@@ -100,12 +100,7 @@ public class WebSocketRTCClient implements AppRTCClient, WebSocketChannelEvents 
         RoomParametersFetcherEvents callbacks = new RoomParametersFetcherEvents() {
             @Override
             public void onSignalingParametersReady(final SignalingParameters params) {
-                WebSocketRTCClient.this.handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        WebSocketRTCClient.this.signalingParametersReady(params);
-                    }
-                });
+                WebSocketRTCClient.this.handler.post(() -> WebSocketRTCClient.this.signalingParametersReady(params));
             }
 
             @Override
@@ -194,10 +189,12 @@ public class WebSocketRTCClient implements AppRTCClient, WebSocketChannelEvents 
                     reportError("Sending offer SDP in non connected state.");
                     return;
                 }
+
                 JSONObject json = new JSONObject();
                 jsonPut(json, "sdp", sdp.description);
                 jsonPut(json, "type", "offer");
                 sendPostMessage(MessageType.MESSAGE, messageUrl, json.toString());
+
                 if (connectionParameters.loopback) {
                     // In loopback mode rename this offer to answer and route it back.
                     SessionDescription sdpAnswer = new SessionDescription(

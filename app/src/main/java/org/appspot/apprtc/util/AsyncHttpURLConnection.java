@@ -30,6 +30,7 @@ public class AsyncHttpURLConnection {
   private final AsyncHttpEvents events;
   private String contentType;
 
+
   /**
    * Http requests callbacks.
    */
@@ -52,6 +53,7 @@ public class AsyncHttpURLConnection {
   public void send() {
     new Thread(this ::sendHttpMessage).start();
   }
+
 
   private void sendHttpMessage() {
     try {

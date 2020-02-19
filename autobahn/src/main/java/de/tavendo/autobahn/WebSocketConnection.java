@@ -238,9 +238,9 @@ public class WebSocketConnection implements WebSocket {
             throw new WebSocketException("unsupported scheme for WebSockets URI");
          }
 
-         if (mWsUri.getScheme().equals("wss")) {
+         /*if (mWsUri.getScheme().equals("wss")) {
             throw new WebSocketException("secure WebSockets not implemented");
-         }
+         }*/
 
          mWsScheme = mWsUri.getScheme();
 
